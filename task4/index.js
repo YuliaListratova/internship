@@ -14,6 +14,7 @@ const monster = {
       physicArmorPercents: 20, // физическая броня
       magicArmorPercents: 20, // магическая броня
       cooldown: 0, // ходов на восстановление
+      timesToReset: 0,
     },
     {
       name: "Огненное дыхание",
@@ -22,6 +23,7 @@ const monster = {
       physicArmorPercents: 0,
       magicArmorPercents: 0,
       cooldown: 3,
+      timesToReset: 0,
     },
     {
       name: "Удар хвостом",
@@ -30,6 +32,7 @@ const monster = {
       physicArmorPercents: 50,
       magicArmorPercents: 0,
       cooldown: 2,
+      timesToReset: 0,
     },
   ],
 };
@@ -47,6 +50,7 @@ const mage = {
       physicArmorPercents: 0,
       magicArmorPercents: 50,
       cooldown: 0,
+      timesToReset: 0,
     },
     {
       name: "Вертушка левой пяткой",
@@ -55,6 +59,7 @@ const mage = {
       physicArmorPercents: 0,
       magicArmorPercents: 0,
       cooldown: 4,
+      timesToReset: 0,
     },
     {
       name: "Каноничный фаербол",
@@ -63,6 +68,7 @@ const mage = {
       physicArmorPercents: 0,
       magicArmorPercents: 0,
       cooldown: 3,
+      timesToReset: 0,
     },
     {
       name: "Магический блок",
@@ -71,6 +77,7 @@ const mage = {
       physicArmorPercents: 100,
       magicArmorPercents: 100,
       cooldown: 4,
+      timesToReset: 0,
     },
   ],
 };
@@ -102,52 +109,92 @@ switch (userLevel) {
 console.log("Ваше начальное здоровье ", mage.maxHealth);
 
 const userName = readlineSync.question("Ваше имя? ");
-mage.name = userName;
+mage.name = userName ? userName : mage.name;
+const getDamage = (damage, armor) => damage - damage * (armor / 100);
 
 while (monster.maxHealth > 0 && mage.maxHealth > 0) {
-  console.log("yes");
-
   console.log(mage.name, "Вас атакует монстр", monster.name);
 
-  const num = [];
-  while (num.length < 1) {
+  let num = null;
+  while (!(num || num == 0)) {
     let number = Math.floor(Math.random() * 10);
-    if (number < 3) {
-      num.push(number);
+    if (number < 3 && !monster.moves[number].timesToReset) {
+      num = number;
     }
   }
 
-  console.log(monster.name, monster.moves[num]);
+  const monsterMove = monster.moves[num];
+  console.log(monster.name, monsterMove);
 
-  const monsterMoves = monster.moves[num];
-  const mageMoves = mage.moves[0];
-  console.log(mageMoves.name);
+  for (let i = 0; i < monster.moves.length; i++) {
+    monster.moves[i].timesToReset = monster.moves[i].timesToReset
+      ? monster.moves[i].timesToReset - 1
+      : 0;
+  }
 
-  const selectAction = readlineSync.question("Выбери действие (от 0 до 3) ");
+  if (monsterMove.cooldown > 0) {
+    monster.moves[num].timesToReset = monsterMove.cooldown;
+  }
+
+  const numUser = [];
+  for (let i = 0; i < mage.moves.length; i++) {
+    if (mage.moves[i].timesToReset === 0) {
+      numUser.push(i);
+    }
+  }
+
+  let selectAction = readlineSync.question(`Выберите действие ${numUser} `);
+
+  const contains = (arr, elem) => {
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i] == elem) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  while (!selectAction || !contains(numUser, selectAction)) {
+    selectAction = readlineSync.question(`Выберите действие ${numUser} `);
+  }
 
   console.log(mage.name, mage.moves[selectAction]);
+  const mageMove = mage.moves[selectAction];
 
-  // const monsterMoves = monster.moves[num];
-  // const mageMoves = mage.moves[select1Action];
-  // console.log(monsterMoves.cooldown);
+  for (let i = 0; i < mage.moves.length; i++) {
+    mage.moves[i].timesToReset = mage.moves[i].timesToReset
+      ? mage.moves[i].timesToReset - 1
+      : 0;
+  }
+
+  if (mageMove.cooldown > 0) {
+    mage.moves[selectAction].timesToReset = mageMove.cooldown;
+  }
 
   const dmgMonster = [];
-  const physicalDamageMonster =
-    monsterMoves.physicArmorPercents - mageMoves.physicalDmg;
-  const magicDamageMonster =
-    monsterMoves.magicArmorPercents - mageMoves.magicDmg;
-  physicalDamageMonster < 0
-    ? dmgMonster.push(physicalDamageMonster * -1)
-    : null;
-  magicDamageMonster < 0 ? dmgMonster.push(magicDamageMonster * -1) : null;
+  const physicalDamageMonster = getDamage(
+    mageMove.physicalDmg,
+    monsterMove.physicArmorPercents
+  );
+  const magicDamageMonster = getDamage(
+    mageMove.magicDmg,
+    monsterMove.magicArmorPercents
+  );
+  const damageMonster = Math.round(physicalDamageMonster + magicDamageMonster);
+  damageMonster > 0 && dmgMonster.push(damageMonster);
   monster.maxHealth = monster.maxHealth - dmgMonster;
 
   const dmgMage = [];
-  const physicalDamageMage =
-    mageMoves.physicArmorPercents - monsterMoves.physicalDmg;
-  const magicDamageMage = mageMoves.magicArmorPercents - monsterMoves.magicDmg;
-  physicalDamageMage < 0 ? dmgMage.push(physicalDamageMage * -1) : null;
-  magicDamageMage < 0 ? dmgMage.push(magicDamageMage * -1) : null;
+  const physicalDamageMage = getDamage(
+    monsterMove.physicalDmg,
+    mageMove.physicArmorPercents
+  );
+  const magicDamageMage = getDamage(
+    monsterMove.magicDmg,
+    mageMove.magicArmorPercents
+  );
+  const damageMage = Math.round(physicalDamageMage + magicDamageMage);
+  damageMage > 0 && dmgMage.push(damageMage);
   mage.maxHealth = mage.maxHealth - dmgMage;
 
   console.log(
