@@ -25,25 +25,6 @@ let str = `Старший братец ПОНЕДЕЛЬНИК –
 очень любит угощенье
 `;
 
-// const stringToArray = (str) => {
-//   return str
-//     .split(" ")
-//     .map((elem) => {
-//       let word = elem;
-//       switch (elem) {
-//         case "ПОНЕДЕЛЬНИК":
-//           word = "MONDAY";
-//           break;
-//         case "ВТОРНИК":
-//           word = "TUESDAY";
-//       }
-//       return word;
-//     })
-//     .join(" ");
-// };
-
-// console.log(stringToArray(str));
-
 // Вариант 1
 // const insertDash = (str) => str
 //     .replaceAll("ПОНЕДЕЛЬНИК", "MONDAY")
@@ -57,47 +38,6 @@ let str = `Старший братец ПОНЕДЕЛЬНИК –
 // console.log(insertDash(str));
 
 // Вариант 2
-// const translate = {
-//   ПОНЕДЕЛЬНИК: "MONDAY",
-//   ВТОРНИК: "TUESDAY",
-//   СРЕДА: "WEDNESDAY",
-//   ЧЕТВЕРГ: "THURSDAY",
-//   ПЯТНИЦА: "FRIDAY",
-//   СУББОТА: "SATURDAY",
-//   ВОСКРЕСЕНЬЕ: "SUNDAY",
-// };
-
-// const translateText = (text) =>
-//   text.replace(
-//     /ПОНЕДЕЛЬНИК|ВТОРНИК|СРЕДА|ЧЕТВЕРГ|ПЯТНИЦА|СУББОТА|ВОСКРЕСЕНЬЕ/g,
-//     (sym) => translate[sym]
-//   );
-
-// console.log(translateText(str));
-
-// Вариант 3
-// const stringToArray = (str) => {
-//   return str.split(" ");
-// };
-// console.log(stringToArray(str));
-
-// const mapArr = stringToArray(str).map((str) => str1);
-
-// function learnJavaScript() {
-//   let a = "Apples";
-//   let str;
-//   switch (a) {
-//     case "ПОНЕДЕЛЬНИК":
-//       "MONDAY";
-//     case "ВТОРНИК":
-//       "TUESDAY";
-//     default:
-//       a = a;
-//   }
-//   return str;
-// }
-
-// Вариант 10
 const translate = {
   ПОНЕДЕЛЬНИК: "MONDAY",
   ВТОРНИК: "TUESDAY",
@@ -109,6 +49,9 @@ const translate = {
 };
 
 const translateText = (text) =>
-  text.split(" ").map((item) => translate[item] ?? item);
+  text.replace(
+    /ПОНЕДЕЛЬНИК|ВТОРНИК|СРЕДА|ЧЕТВЕРГ|ПЯТНИЦА|СУББОТА|ВОСКРЕСЕНЬЕ/g,
+    (sym) => translate[sym]
+  );
 
 console.log(translateText(str));
