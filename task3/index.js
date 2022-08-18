@@ -32,27 +32,33 @@ let userNumber;
 
 do {
   userNumber = readlineSync.question("Назовите число ");
-  const arrHiddenNumber = num;
-  const arrUserNumber = userNumber.split("");
+  if (userNumber.length == userLevel) {
+    const arrHiddenNumber = hiddenNumber.split("");
+    const arrUserNumber = userNumber.split("");
 
-  let sum = 0;
-  let summa = 0;
-  const rightPlace = [];
-  const wrongPlace = [];
-  for (let i = 0; i < arrUserNumber.length; i++) {
-    if (arrHiddenNumber.includes(arrUserNumber[i])) {
-      const position = arrHiddenNumber.indexOf(arrUserNumber[i]);
-      const positionUserNumber = arrUserNumber.indexOf(arrUserNumber[i]);
-      if (position == positionUserNumber) {
-        summa++;
-        rightPlace.push(arrUserNumber[i]);
-      } else {
-        sum++;
-        wrongPlace.push(arrUserNumber[i]);
+    let sumNumWrongPlace = 0;
+    let sumRightPlace = 0;
+    const rightPlace = [];
+    const wrongPlace = [];
+    for (let i = 0; i < arrUserNumber.length; i++) {
+      if (arrHiddenNumber.includes(arrUserNumber[i])) {
+        const position = arrHiddenNumber.indexOf(arrUserNumber[i]);
+        const positionUserNumber = arrUserNumber.indexOf(arrUserNumber[i]);
+        if (position == positionUserNumber) {
+          sumRightPlace++;
+          rightPlace.push(arrUserNumber[i]);
+        } else {
+          sumNumWrongPlace++;
+          wrongPlace.push(arrUserNumber[i]);
+        }
       }
     }
+    console.log(
+      "совпавших цифр не на своих местах",
+      sumNumWrongPlace,
+      wrongPlace
+    );
+    console.log("цифр на своих местах", sumRightPlace, rightPlace);
   }
-  console.log("совпавших цифр не на своих местах", sum, wrongPlace);
-  console.log("цифр на своих местах", summa, rightPlace);
 } while (userNumber != hiddenNumber);
 console.log("Вы выиграли!");
